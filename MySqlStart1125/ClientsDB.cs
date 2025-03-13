@@ -74,7 +74,10 @@ namespace MySqlStart1125
                 while (dr.Read())
                 {
                     int id = dr.GetInt32(0);
-                    string fname = dr.GetString("Fname");
+                    string fname = string.Empty;
+                    // проверка на то, что столбец имеет значение
+                    if (!dr.IsDBNull(1))
+                        fname = dr.GetString("Fname");
                     string lname = dr.GetString("Lname");
                     clients.Add(new Client
                     {
