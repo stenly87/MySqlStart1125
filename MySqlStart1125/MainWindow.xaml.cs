@@ -37,6 +37,7 @@ namespace MySqlStart1125
             // полученную коллекцию выводим в список
             clients.ForEach(s => Clients.Add(s));
 
+            // пример изменения записи
             //var edit = Clients.First();
             //edit.FirstName = "Иван";
             //edit.LastName = "Петров";
@@ -46,9 +47,9 @@ namespace MySqlStart1125
             //else
             //    MessageBox.Show("Запись изменена");
 
-
-            var remove = Clients.Last();
-            clientsDB.Remove(remove);
+            // пример удаления записи
+            //var remove = Clients.Last();
+            //clientsDB.Remove(remove);
 
         }
     }
