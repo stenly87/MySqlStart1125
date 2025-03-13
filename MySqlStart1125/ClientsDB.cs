@@ -12,6 +12,11 @@ namespace MySqlStart1125
     {
         MySqlConnection connection;
 
+        internal void SetConnection(MySqlConnection connection)
+        {
+            this.connection = connection;
+        }
+
         public bool Insert(Client client)
         {
             bool result = false;
@@ -32,10 +37,12 @@ namespace MySqlStart1125
             {
                 // выполняем запрос через ExecuteScalar, получаем id вставленной записи
                 // если нам не нужен id, то в запросе убираем часть select LAST_INSERT_ID(); и выполняем команду через ExecuteNonQuery
-                ulong id = (ulong)cmd.ExecuteScalar();
+                int id = (int)(ulong)cmd.ExecuteScalar();
                 if (id > 0)
                 {
                     MessageBox.Show(id.ToString());
+                    // назначаем полученный id обратно в объект для дальнейшей работы
+                    client.ID = id;
                     result = true;
                 }
                 else
@@ -44,7 +51,7 @@ namespace MySqlStart1125
                 }
             }
             catch (Exception ex)
-            {
+            {           
                 MessageBox.Show(ex.Message);
             }
             connection.Close();
@@ -58,7 +65,7 @@ namespace MySqlStart1125
                 return clients;
 
             connection.Open();
-            var command = new MySqlCommand("select `id`, `Fname`, `Lname` from `Clients`", connection);
+            var command = new MySqlCommand("select `id`, `Fname`, `Lname` from `Clients` ", connection);
             try
             {
                 // выполнение запроса, который возвращает результат-таблицу
@@ -66,7 +73,7 @@ namespace MySqlStart1125
                 // в цикле читаем построчно всю таблицу
                 while (dr.Read())
                 {
-                    int id = dr.GetInt32("id");
+                    int id = dr.GetInt32(0);
                     string fname = dr.GetString("Fname");
                     string lname = dr.GetString("Lname");
                     clients.Add(new Client
@@ -109,10 +116,6 @@ namespace MySqlStart1125
             return result;
         }
 
-        internal void SetConnection(MySqlConnection connection)
-        {
-            this.connection = connection;
-        }
 
         internal bool Remove(Client remove)
         {

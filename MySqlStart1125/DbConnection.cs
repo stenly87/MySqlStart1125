@@ -14,14 +14,15 @@ namespace MySqlStart1125
 
         public void Config()
         {
-            // пример строки подключения: "userid=student;password=student;database=1125_new_2025;server=192.168.200.13";
+            // пример строки подключения: "userid=student;password=student;database=1125_new_2025;server=192.168.200.13;characterset=utf8mb4";
             // конфигурация берется из файла / из окошка / из настроек / или статично
             MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder();
             sb.UserID = "student";
             sb.Password = "student";
             sb.Server = "192.168.200.13";
             sb.Database = "1125_new_2025";
-            sb.CharacterSet = "utf8";
+            sb.CharacterSet = "utf8mb4";
+            
             // инициализация объекта для подключения к субд
             _connection = new MySqlConnection(sb.ToString());
         }

@@ -41,7 +41,6 @@ namespace MySqlStart1125
             //var edit = Clients.First();
             //edit.FirstName = "Иван";
             //edit.LastName = "Петров";
-
             //if (!clientsDB.Update(edit))
             //    MessageBox.Show("Сохранение изменений не срослось");
             //else
