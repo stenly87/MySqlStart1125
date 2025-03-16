@@ -31,7 +31,6 @@ namespace MySqlStart1125
         {
             if (_connection == null)
                 Config();
-
             try
             {
                 _connection.Open();
@@ -60,10 +59,10 @@ namespace MySqlStart1125
             }
         }
 
-        internal void SetConnection(ClientsDB clientsDB)
-        {
-            Config();
-            clientsDB.SetConnection(_connection);
+        internal MySqlCommand CreateCommand(string sql)
+        {            
+            return new MySqlCommand(sql, _connection);
         }
+
     }
 }

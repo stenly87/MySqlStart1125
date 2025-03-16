@@ -25,8 +25,7 @@ namespace MySqlStart1125
             DataContext = this;
 
             db = new DbConnection();
-            ClientsDB clientsDB = new ClientsDB();
-            db.SetConnection(clientsDB);
+            ClientsDB clientsDB = new ClientsDB(db);
 
             // пример с добавлением в бд
             //Client client = new Client { FirstName = "Петр", LastName = "Иванов" };

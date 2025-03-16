@@ -10,11 +10,11 @@ namespace MySqlStart1125
 {
     internal class ClientsDB
     {
-        MySqlConnection connection;
+        DbConnection connection;
 
-        internal void SetConnection(MySqlConnection connection)
+        public ClientsDB(DbConnection db)
         {
-            this.connection = connection;
+            this.connection = db;
         }
 
         public bool Insert(Client client)
@@ -23,38 +23,39 @@ namespace MySqlStart1125
             if (connection == null)
                 return result;
 
-            connection.Open();
-            
-            MySqlCommand cmd = new MySqlCommand("insert into `Clients` Values (0, @fname, @lname);select LAST_INSERT_ID();",
-                 connection);
-            // путем добавления значений в запрос через параметры мы используем экранирование опасных символов
-            cmd.Parameters.Add(new MySqlParameter("fname", client.FirstName));
-
-            // можно указать параметр через отдельную переменную
-            MySqlParameter lname = new MySqlParameter("lname", client.LastName);
-            cmd.Parameters.Add(lname);
-            try
+            if (connection.OpenConnection())
             {
-                // выполняем запрос через ExecuteScalar, получаем id вставленной записи
-                // если нам не нужен id, то в запросе убираем часть select LAST_INSERT_ID(); и выполняем команду через ExecuteNonQuery
-                int id = (int)(ulong)cmd.ExecuteScalar();
-                if (id > 0)
+                MySqlCommand cmd = connection.CreateCommand("insert into `Clients` Values (0, @fname, @lname);select LAST_INSERT_ID();");  
+                   
+                // путем добавления значений в запрос через параметры мы используем экранирование опасных символов
+                cmd.Parameters.Add(new MySqlParameter("fname", client.FirstName));
+
+                // можно указать параметр через отдельную переменную
+                MySqlParameter lname = new MySqlParameter("lname", client.LastName);
+                cmd.Parameters.Add(lname);
+                try
                 {
-                    MessageBox.Show(id.ToString());
-                    // назначаем полученный id обратно в объект для дальнейшей работы
-                    client.ID = id;
-                    result = true;
+                    // выполняем запрос через ExecuteScalar, получаем id вставленной записи
+                    // если нам не нужен id, то в запросе убираем часть select LAST_INSERT_ID(); и выполняем команду через ExecuteNonQuery
+                    int id = (int)(ulong)cmd.ExecuteScalar();
+                    if (id > 0)
+                    {
+                        MessageBox.Show(id.ToString());
+                        // назначаем полученный id обратно в объект для дальнейшей работы
+                        client.ID = id;
+                        result = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Запись не добавлена");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Запись не добавлена");
+                    MessageBox.Show(ex.Message);
                 }
             }
-            catch (Exception ex)
-            {           
-                MessageBox.Show(ex.Message);
-            }
-            connection.Close();
+            connection.CloseConnection();
             return result;
         }
 
@@ -64,34 +65,36 @@ namespace MySqlStart1125
             if (connection == null)
                 return clients;
 
-            connection.Open();
-            var command = new MySqlCommand("select `id`, `Fname`, `Lname` from `Clients` ", connection);
-            try
+            if (connection.OpenConnection())
             {
-                // выполнение запроса, который возвращает результат-таблицу
-                MySqlDataReader dr = command.ExecuteReader();
-                // в цикле читаем построчно всю таблицу
-                while (dr.Read())
+                var command = connection.CreateCommand("select `id`, `Fname`, `Lname` from `Clients` ");
+                try
                 {
-                    int id = dr.GetInt32(0);
-                    string fname = string.Empty;
-                    // проверка на то, что столбец имеет значение
-                    if (!dr.IsDBNull(1))
-                        fname = dr.GetString("Fname");
-                    string lname = dr.GetString("Lname");
-                    clients.Add(new Client
+                    // выполнение запроса, который возвращает результат-таблицу
+                    MySqlDataReader dr = command.ExecuteReader();
+                    // в цикле читаем построчно всю таблицу
+                    while (dr.Read())
                     {
-                        ID = id,
-                        FirstName = fname,
-                        LastName = lname
-                    });
+                        int id = dr.GetInt32(0);
+                        string fname = string.Empty;
+                        // проверка на то, что столбец имеет значение
+                        if (!dr.IsDBNull(1))
+                            fname = dr.GetString("Fname");
+                        string lname = dr.GetString("Lname");
+                        clients.Add(new Client
+                        {
+                            ID = id,
+                            FirstName = fname,
+                            LastName = lname
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            connection.Close();
+            connection.CloseConnection();
             return clients;
         }
 
@@ -101,21 +104,23 @@ namespace MySqlStart1125
             if (connection == null)
                 return result;
 
-            connection.Open();
-            var mc = new MySqlCommand($"update `Clients` set `Fname`=@fname, `Lname`=@lname where `id` = {edit.ID}" , connection);
-            mc.Parameters.Add(new MySqlParameter("fname", edit.FirstName));
-            mc.Parameters.Add(new MySqlParameter("lname", edit.LastName));
+            if (connection.OpenConnection())
+            {
+                var mc = connection.CreateCommand($"update `Clients` set `Fname`=@fname, `Lname`=@lname where `id` = {edit.ID}");
+                mc.Parameters.Add(new MySqlParameter("fname", edit.FirstName));
+                mc.Parameters.Add(new MySqlParameter("lname", edit.LastName));
 
-            try
-            {
-                mc.ExecuteNonQuery();
-                result = true;
+                try
+                {
+                    mc.ExecuteNonQuery();
+                    result = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            connection.Close();
+            connection.CloseConnection();
             return result;
         }
 
@@ -125,19 +130,21 @@ namespace MySqlStart1125
             bool result = false;
             if (connection == null)
                 return result;
-            
-            connection.Open();
-            var mc = new MySqlCommand($"delete from `Clients` where `id` = {remove.ID}", connection);
-            try
+
+            if (connection.OpenConnection())
             {
-                mc.ExecuteNonQuery ();
-                result = true;
+                var mc = connection.CreateCommand($"delete from `Clients` where `id` = {remove.ID}");
+                try
+                {
+                    mc.ExecuteNonQuery();
+                    result = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            connection.Close();
+            connection.CloseConnection();
             return result;
         }
     }
