@@ -1,4 +1,5 @@
 ﻿using MySqlConnector;
+using MySqlStart1125.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace MySqlStart1125
     {
         DbConnection connection;
 
-        public ClientsDB(DbConnection db)
+        private ClientsDB(DbConnection db)
         {
             this.connection = db;
         }
@@ -146,6 +147,14 @@ namespace MySqlStart1125
             }
             connection.CloseConnection();
             return result;
+        }
+
+        static ClientsDB db;
+        public static ClientsDB GetDb()
+        {
+            if (db == null)
+                db = new ClientsDB(DbConnection.GetDbConnection());
+            return db;
         }
     }
 }

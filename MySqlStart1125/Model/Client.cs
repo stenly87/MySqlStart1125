@@ -1,4 +1,4 @@
-﻿namespace MySqlStart1125
+﻿namespace MySqlStart1125.Model
 {
     public class Client
     {

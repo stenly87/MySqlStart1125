@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace MySqlStart1125
+namespace MySqlStart1125.Model
 {
     internal class DbConnection
     {
@@ -22,7 +22,7 @@ namespace MySqlStart1125
             sb.Server = "192.168.200.13";
             sb.Database = "1125_new_2025";
             sb.CharacterSet = "utf8mb4";
-            
+
             // инициализация объекта для подключения к субд
             _connection = new MySqlConnection(sb.ToString());
         }
@@ -60,9 +60,20 @@ namespace MySqlStart1125
         }
 
         internal MySqlCommand CreateCommand(string sql)
-        {            
+        {
             return new MySqlCommand(sql, _connection);
         }
+
+
+        static DbConnection dbConnection;
+        private DbConnection() { }
+        public static DbConnection GetDbConnection()
+        {
+            if (dbConnection == null)
+                dbConnection = new DbConnection();
+            return dbConnection;
+        }
+
 
     }
 }

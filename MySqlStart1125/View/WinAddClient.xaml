@@ -1,0 +1,24 @@
+﻿<Window x:Class="MySqlStart1125.WinAddClient"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MySqlStart1125"
+        xmlns:mvvm="clr-namespace:MySqlStart1125.VM"
+        mc:Ignorable="d"
+        DataContext="{DynamicResource vm}"
+        Title="Добавление клиента" Height="450" Width="500" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <mvvm:WinAddClientMvvm x:Key="vm"/>
+    </Window.Resources>
+    <StackPanel Grid.Row="1" Grid.Column="1" >
+        <StackPanel DataContext="{Binding NewClient}">
+            <TextBlock Text="Добавление новой записи"/>
+            <TextBlock Text="Имя"/>
+            <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Text="Фамилия"/>
+            <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+        <Button Content="Сохранить изменения" Command="{Binding InsertClient}"/>
+    </StackPanel>
+</Window>
